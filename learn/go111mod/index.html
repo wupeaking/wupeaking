@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Golang 1.11Module研究</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>Golang 1.11Module研究</h2>
+                    <div class="portfolio-meta">
+                        <span>2018-11-07</span>|
+                        <span> Category: ethereum</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/gopher.png" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    
+
+<h2 id="开启module特性">开启MODULE特性</h2>
+
+<p>go1.11对module有了新的支持， 在下一个版本可能对移除掉对GOPATH的支持。目前这个功能是根据一个环境变量GO111MODULE的值来进行控制的。</p>
+
+<p><code>GO111MODULE=off</code> 关闭module特性 会从GOPATH和vender中查找依赖</p>
+
+<p><code>GO111MODULE=on</code> 开启module特性 忽略GOPATH和vender的文件夹 根据go.mod去下载依赖 并将依赖放到$GOPATH/pkg/mod</p>
+
+<p><code>GO111MODULE=auto</code> 这个是默认值 在 $GOPATH/src 外面且根目录有 go.mod 文件时，开启模块支持。 注意是有两个条件要求。</p>
+
+<p>在使用模块特性的时候，过它还是会把下载的依赖储存在 $GOPATH/pkg/mod 中，也会把 go install 的结果放在 $GOPATH/bin 中。</p>
+
+<h2 id="go-mod-子命令">go mod 子命令</h2>
+
+<pre><code class="language-shell">	download    download modules to local cache
+	edit        edit go.mod from tools or scripts
+	graph       print module requirement graph
+	init        initialize new module in current directory
+	tidy        add missing and remove unused modules
+	vendor      make vendored copy of dependencies
+	verify      verify dependencies have expected content
+	why         explain why packages or modules are needed
+</code></pre>
+
+<h2 id="如何创建mod">如何创建mod</h2>
+
+<h4 id="使用go-子命令自动生成">使用go 子命令自动生成</h4>
+
+<p>使用<code>go mod init -module 包名称</code>会创建一个go.mod文件 并且会在文件的第一行写入模块名称。</p>
+
+<p>这个时候我们可以使用<code>go build go test go list</code> 来自动去解析包需要的依赖，然后会将依赖写入go.mod中的require中。
+但是这个时候依赖的版本号会是自动按着依赖包最新的版本生成。</p>
+
+<p>一份go.mod的文件格式类似于下面这样:</p>
+
+<pre><code class="language-code">module example.com/m 
+
+require (
+    golang.org/x/text v0.3.0
+    gopkg.in/yaml.v2 v2.1.0 
+)
+
+replace (
+    golang.org/x/text =&gt; github.com/golang/text v0.3.0
+)
+</code></pre>
+
+<p>go.mod中的replace可以用于替换替换依赖，这样对于一些需要翻墙而不能下载的包有很大的帮助。</p>
+
+<p>我们可以使用<code>go list -m -json all</code> 来查看依赖信息</p>
+
+<h4 id="手动编辑go-mod文件">手动编辑go.mod文件</h4>
+
+<p>对于自动生成的go.mod文件依赖可能是不是我们需要的版本，这个时候我们需要手动修改到指定版本。 对于一些翻墙的包依赖可以进行替换成内网能下载的包。
+<code>go mod edit -require path@version</code> <code>go mod edit -replace=old[@v]=new[@v]</code> 可以命令行修改文件。</p>
+
+<h2 id="关于版本和选择">关于版本和选择</h2>
+
+<p>有一些场景可能对依赖包的版本不是确定的，比如是小于或者大于某个版本 这个时候我们可以直接修改require的版本号类似于这个样子
+<code>golang.org/x/text &gt;v0.3.0</code> 或者直接使用命令行进行编辑 <code>go mod edit -require golang.org/x/text &gt;v0.3.0</code></p>
+
+<p>minimal version selection(MVS)进行包依赖选择, 由于复杂项目中可能存在对同一个依赖包的不同版本依赖，如何选择版本是个问题.</p>
+
+<p><img src="/images/blog/C0151259E0FAA9CA1BAAF24B19CA6F1E.png" alt="rsc-mvs-version-select-1.png" /></p>
+
+<p><img src="/images/blog/883582CCDF6B9D3D1E9B6A743EA4E8E8.png" alt="rsc-mvs-version-select-list.png" /></p>
+
+<p>MVS以build list为中心，从一个空的build list集合开始，先加入main module(A1)，然后递归计算main module的build list，我们看到在这个过程中，先得到C 1.2的build list，然后是B 1.2的build list，去重合并后形成A1的rough build list，选择集合中每个module的最新version，最终形成A1的build list。</p>
+
+<h2 id="vendor和go-module的配合">vendor和go module的配合</h2>
+
+<p>Go modules支持通过<code>go mod -vendor</code>命令将某个module的所有依赖保存一份copy到root module dir的vendor下, 这个时候我们编译的时候依然可以使用vendor中的依赖。
+<code>go build -getmode=vendor main.go</code> 注意这个时候并不是说使用了GOPATH的依赖模式，只是说编译的时候查找go mod不在从$PATH/pkg/mod中 而是从根目录下的vendor中查找。</p>
+
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>November 20, 2018</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

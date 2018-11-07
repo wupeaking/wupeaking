@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>wupenxin的个人主页</title>
+    <link>https://wupeaking.github.io/</link>
+    <description>Recent content on wupenxin的个人主页</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh_CN</language>
+    <lastBuildDate>Wed, 07 Nov 2018 15:04:09 +0800</lastBuildDate>
+    
+	<atom:link href="https://wupeaking.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Golang 1.11Module研究</title>
+      <link>https://wupeaking.github.io/learn/go111mod/</link>
+      <pubDate>Wed, 07 Nov 2018 15:04:09 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/go111mod/</guid>
+      <description>开启MODULE特性 go1.11对module有了新的支持， 在下一个版本可能对移除掉对GOPATH的支持。目前这个功能是根据一个环境变量GO111MODULE的值来进行控制的。
+GO111MODULE=off 关闭module特性 会从GOPATH和vender中查找依赖
+GO111MODULE=on 开启module特性 忽略GOPATH和vender的文件夹 根据go.mod去下载依赖 并将依赖放到$GOPATH/pkg/mod
+GO111MODULE=auto 这个是默认值 在 $GOPATH/src 外面且根目录有 go.mod 文件时，开启模块支持。 注意是有两个条件要求。
+在使用模块特性的时候，过它还是会把下载的依赖储存在 $GOPATH/pkg/mod 中，也会把 go install 的结果放在 $GOPATH/bin 中。
+go mod 子命令 download download modules to local cache edit edit go.mod from tools or scripts graph print module requirement graph init initialize new module in current directory tidy add missing and remove unused modules vendor make vendored copy of dependencies verify verify dependencies have expected content why explain why packages or modules are needed  如何创建mod 使用go 子命令自动生成 使用go mod init -module 包名称会创建一个go.</description>
+    </item>
+    
+    <item>
+      <title>以太坊私有网络创建</title>
+      <link>https://wupeaking.github.io/learn/ethereum_priv_net/</link>
+      <pubDate>Wed, 07 Nov 2018 15:04:09 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/ethereum_priv_net/</guid>
+      <description>以太坊启动测试链命令参考 ./geth --datadir /Volumes/exdisk/testnet --rpc --rpcaddr 0.0.0.0 --rpcport 8544 --port &#39;30302&#39; --rpcapi &#39;eth,web3,personal,net,miner,admin,debug,txpool&#39; --testnet --fast --maxpeers 50 --cache 1024 --ipcpath /goproject/src/github.com/ethereum/go-ethereum/geth.ipc  以太坊搭建私有链 编辑创世区块配置文件 mkidr gethdata vim getdata/genesis.json  { &amp;quot;config&amp;quot;: { &amp;quot;chainID&amp;quot;: 1024, &amp;quot;homesteadBlock&amp;quot;: 0, &amp;quot;eip155Block&amp;quot;: 0, &amp;quot;eip158Block&amp;quot;: 0, &amp;quot;eip150Block&amp;quot;: 0, &amp;quot;byzantiumBlock&amp;quot;: 0, &amp;quot;daoForkSupport&amp;quot;: true }, &amp;quot;alloc&amp;quot;: {}, &amp;quot;coinbase&amp;quot;: &amp;quot;0x0000000000000000000000000000000000000000&amp;quot;, &amp;quot;difficulty&amp;quot;: &amp;quot;0x100&amp;quot;, &amp;quot;extraData&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;gasLimit&amp;quot;: &amp;quot;0x2fefd8&amp;quot;, &amp;quot;nonce&amp;quot;: &amp;quot;0xdeadbeefdeadbeef&amp;quot;, &amp;quot;mixhash&amp;quot;: &amp;quot;0x0000000000000000000000000000000000000000000000000000000000000000&amp;quot;, &amp;quot;parentHash&amp;quot;: &amp;quot;0x0000000000000000000000000000000000000000000000000000000000000000&amp;quot;, &amp;quot;timestamp&amp;quot;: &amp;quot;0x00&amp;quot; }  mixhash
+ 与nonce配合用于挖矿，由上一个区块的一部分生成的hash。注意他和nonce的设置需要满足以太坊的Yellow paper, 4.</description>
+    </item>
+    
+  </channel>
+</rss>

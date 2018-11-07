@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>以太坊私有网络创建</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>以太坊私有网络创建</h2>
+                    <div class="portfolio-meta">
+                        <span>2018-11-07</span>|
+                        <span> Category: ethereum</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/ethereum.png" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    
+
+<h1 id="以太坊启动测试链命令参考">以太坊启动测试链命令参考</h1>
+
+<pre><code class="language-shell">./geth --datadir /Volumes/exdisk/testnet --rpc --rpcaddr 0.0.0.0 --rpcport 8544 --port '30302' --rpcapi 'eth,web3,personal,net,miner,admin,debug,txpool' --testnet --fast --maxpeers 50 --cache 1024 --ipcpath /goproject/src/github.com/ethereum/go-ethereum/geth.ipc
+</code></pre>
+
+<h1 id="以太坊搭建私有链">以太坊搭建私有链</h1>
+
+<h2 id="编辑创世区块配置文件">编辑创世区块配置文件</h2>
+
+<pre><code class="language-shell">mkidr gethdata
+vim getdata/genesis.json
+</code></pre>
+
+<pre><code class="language-json">{
+  &quot;config&quot;: {
+    &quot;chainID&quot;: 1024,
+    &quot;homesteadBlock&quot;: 0,
+    &quot;eip155Block&quot;: 0,
+    &quot;eip158Block&quot;: 0,
+    &quot;eip150Block&quot;: 0,
+    &quot;byzantiumBlock&quot;: 0,
+    &quot;daoForkSupport&quot;: true
+  },
+  &quot;alloc&quot;: {},
+  &quot;coinbase&quot;: &quot;0x0000000000000000000000000000000000000000&quot;,
+  &quot;difficulty&quot;: &quot;0x100&quot;,
+  &quot;extraData&quot;: &quot;&quot;,
+  &quot;gasLimit&quot;: &quot;0x2fefd8&quot;,
+  &quot;nonce&quot;: &quot;0xdeadbeefdeadbeef&quot;,
+  &quot;mixhash&quot;: &quot;0x0000000000000000000000000000000000000000000000000000000000000000&quot;,
+  &quot;parentHash&quot;: &quot;0x0000000000000000000000000000000000000000000000000000000000000000&quot;,
+  &quot;timestamp&quot;: &quot;0x00&quot;
+}
+</code></pre>
+
+<p>mixhash</p>
+
+<blockquote>
+<p>与nonce配合用于挖矿，由上一个区块的一部分生成的hash。注意他和nonce的设置需要满足以太坊的Yellow paper, 4.3.4. Block Header Validity, (44)章节所描述的条件。.</p>
+</blockquote>
+
+<p>nonce</p>
+
+<blockquote>
+<p>nonce就是一个64位随机数，用于挖矿，注意他和mixhash的设置需要满足以太坊的Yellow paper, 4.3.4. Block Header Validity, (44)章节所描述的条件。</p>
+</blockquote>
+
+<p>difficulty</p>
+
+<blockquote>
+<p>设置当前区块的难度，如果难度过大，cpu挖矿就很难，这里设置较小难度</p>
+</blockquote>
+
+<p>alloc</p>
+
+<blockquote>
+<p>用来预置账号以及账号的以太币数量，因为私有链挖矿比较容易，所以我们不需要预置有币的账号，需要的时候自己创建即可以。</p>
+</blockquote>
+
+<p>coinbase</p>
+
+<blockquote>
+<p>矿工的账号，随便填</p>
+</blockquote>
+
+<p>timestamp</p>
+
+<blockquote>
+<p>设置创世块的时间戳</p>
+</blockquote>
+
+<p>parentHash</p>
+
+<blockquote>
+<p>上一个区块的hash值，因为是创世块，所以这个值是0</p>
+</blockquote>
+
+<p>extraData</p>
+
+<blockquote>
+<p>附加信息，随便填，可以填你的个性信息</p>
+</blockquote>
+
+<p>gasLimit</p>
+
+<blockquote>
+<p>该值设置对GAS的消耗总量限制，用来限制区块能包含的交易信息总和，因为我们是私有链，所以填最大。</p>
+</blockquote>
+
+<h2 id="根据配置文件创建创世区块">根据配置文件创建创世区块</h2>
+
+<pre><code class="language-shell">geth --datadir &quot;gethdata/priv&quot; init gethdata/genesis.json
+</code></pre>
+
+<h2 id="启动geth">启动geth</h2>
+
+<pre><code class="language-shell">geth --datadir &quot;gethdata/priv&quot; --rpc --networkid 314590 --rpcaddr 0.0.0.0 --rpcport 8542 --port '30301' --rpcapi 'eth,web3,personal,net,miner,admin,debug'  --ws --wsport 8585 --wsapi 'eth,web3,personal,net,miner,admin,debug'
+</code></pre>
+
+<p>登录控制台查看节点信息</p>
+
+<pre><code class="language-shell">admin.nodeInfo.enode
+&quot;enode://a1e18dd40fbce856d8.......2eabd24e29a@[::]:30303?discport=0&quot;
+</code></pre>
+
+<h2 id="启动另一个节点">启动另一个节点</h2>
+
+<pre><code class="language-shell">geth --datadir &quot;gethdata/priv&quot; --rpc --networkid 314590 --rpcaddr 0.0.0.0 --rpcport 8543 --port '30302' --rpcapi 'eth,web3,personal,net,miner,admin,debug'  --ws --wsport 8585 --wsapi 'eth,web3,personal,net,miner,admin,debug'
+</code></pre>
+
+<h2 id="尝试加入之前的节点">尝试加入之前的节点</h2>
+
+<pre><code class="language-shell">&gt; admin.addPeer(&quot;enode://a1e18dd40fbce856d84b8c6872d4158ab152812a081d1608643fd8a9c7d650ad161b5ef0b0a2a94357d2d6f3a044b380445f9033550233f8ded232eabd24e29a@ip_address:30301&quot;)
+
+&gt; net.peerCount
+&gt; admin.peers
+</code></pre>
+
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>11月7号, 2018</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

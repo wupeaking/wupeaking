@@ -17,11 +17,8 @@
       <pubDate>Thu, 08 Nov 2018 12:13:29 +0800</pubDate>
       
       <guid>https://wupeaking.github.io/learn/mapreduce/</guid>
-      <description>什么是MapReduce  按着Google论文的说法, MapReduce是一种编程模型。 专为处理超大数据集的一种实现。 分为Map和Reduce两个阶段。 用户首先创建Map函数处理输入的然后输出; 然后在创建Reduce函数对输入的进行合并 生成结果。
- 它有什么好处  可以在大量的普通的计算机上并行执行， 将大数据分割成多个小数据块在各个普通计算机上进行并行运算快速得到运算结果。
- 可以用在哪些方面  计算URL访问频率: &amp;gt; Map函数处理日志中的Web请求记录然后输出, reduce函数将相同url的value值累加起来产生的结果 倒排索引: &amp;gt; Map 函数分析每个文档输出一个(词,文档号)的列表,Reduce 函数的输入是一个给定词的所有 (词,文档号),排序所有的文档号,输出(词,list(文档号))。所有的输出集合形成一个简单的倒排索引,它 以一种简单的算法跟踪词在文档中的位置。 分布式排序: &amp;gt; Map 函数从每个记录提取 key,输出(key,record)。Reduce 函数不改变任何的值。  执行流程概括 会有几个术语说明  worker 表示运算程序 master 应用程序调度者 负责分配任务  ###流程
- 用户程序需要调用MapReduce库将输入文件分割成M个数据片段。 然后在机器集群中创建大量程序副本。其中有个特殊副本为master, 其他副本用于执行任务。 然后master将M个Map任务和R个Reduce分配到一个空闲的worker上。 被分配的Map任务(如编号m)开始读取m号的数据片段，解析对应的然后调用用户自定义的map函数生成并缓存到内存中。 缓存的根据hash(key) mod R 运算分到R个区域写入本地磁盘上。master负责将这些存储位置传送给Reduce worker Reduce worker读取Map worker存储的数据首先对key进行排序将相同的key值进行聚合。 Reduce worker遍历排序后的中间数据将传递给用户自定义的Reduce函数，将结果追加到输出。 所有Map和Reduce任务完成后, 则master唤醒用户任务执行完成。  一个大文件排序的例子 假设有一个超大文件每一行均是一个数字， 使用MapReduce对这个大文件如何排序呢？ 按着上述流程我们一步步分析一下。
- 首先将大文件分成M块 每一块的内容类似下面这样 &amp;gt; 100 897876 101 7837 102 4827482 &amp;hellip;.</description>
+      <description>&lt;p&gt;按着Google论文的说法, MapReduce是一种编程模型。 专为处理超大数据集的一种实现。 分为Map和Reduce两个阶段。 用户首先创建Map函数处理输入的&lt;key, value&gt;然后输出&lt;key, set(value)&gt;; 然后在创建Reduce函数对输入的&lt;key, set(value)&gt;进行合并 生成结果。
+&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -30,12 +27,8 @@
       <pubDate>Wed, 07 Nov 2018 15:04:09 +0800</pubDate>
       
       <guid>https://wupeaking.github.io/learn/go111mod/</guid>
-      <description>开启MODULE特性 go1.11对module有了新的支持， 在下一个版本可能对移除掉对GOPATH的支持。目前这个功能是根据一个环境变量GO111MODULE的值来进行控制的。
-GO111MODULE=off 关闭module特性 会从GOPATH和vender中查找依赖
-GO111MODULE=on 开启module特性 忽略GOPATH和vender的文件夹 根据go.mod去下载依赖 并将依赖放到$GOPATH/pkg/mod
-GO111MODULE=auto 这个是默认值 在 $GOPATH/src 外面且根目录有 go.mod 文件时，开启模块支持。 注意是有两个条件要求。
-在使用模块特性的时候，过它还是会把下载的依赖储存在 $GOPATH/pkg/mod 中，也会把 go install 的结果放在 $GOPATH/bin 中。
-go mod 子命令 download download modules to local cache edit edit go.mod from tools or scripts graph print module requirement graph init initialize new module in current directory tidy add missing and remove unused modules vendor make vendored copy of dependencies verify verify dependencies have expected content why explain why packages or modules are needed  如何创建mod 使用go 子命令自动生成 使用go mod init -module 包名称会创建一个go.</description>
+      <description>&lt;p&gt;go1.11对module有了新的支持， 在下一个版本可能对移除掉对GOPATH的支持。目前这个功能是根据一个环境变量GO111MODULE的值来进行控制的。
+&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -44,8 +37,7 @@ go mod 子命令 download download modules to local cache edit edit go.mod from 
       <pubDate>Wed, 07 Nov 2018 15:04:09 +0800</pubDate>
       
       <guid>https://wupeaking.github.io/learn/ethereum_priv_net/</guid>
-      <description>以太坊启动测试链命令参考 ./geth --datadir /Volumes/exdisk/testnet --rpc --rpcaddr 0.0.0.0 --rpcport 8544 --port &#39;30302&#39; --rpcapi &#39;eth,web3,personal,net,miner,admin,debug,txpool&#39; --testnet --fast --maxpeers 50 --cache 1024 --ipcpath /goproject/src/github.com/ethereum/go-ethereum/geth.ipc  以太坊搭建私有链 编辑创世区块配置文件 mkidr gethdata vim getdata/genesis.json  { &amp;quot;config&amp;quot;: { &amp;quot;chainID&amp;quot;: 1024, &amp;quot;homesteadBlock&amp;quot;: 0, &amp;quot;eip155Block&amp;quot;: 0, &amp;quot;eip158Block&amp;quot;: 0, &amp;quot;eip150Block&amp;quot;: 0, &amp;quot;byzantiumBlock&amp;quot;: 0, &amp;quot;daoForkSupport&amp;quot;: true }, &amp;quot;alloc&amp;quot;: {}, &amp;quot;coinbase&amp;quot;: &amp;quot;0x0000000000000000000000000000000000000000&amp;quot;, &amp;quot;difficulty&amp;quot;: &amp;quot;0x100&amp;quot;, &amp;quot;extraData&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;gasLimit&amp;quot;: &amp;quot;0x2fefd8&amp;quot;, &amp;quot;nonce&amp;quot;: &amp;quot;0xdeadbeefdeadbeef&amp;quot;, &amp;quot;mixhash&amp;quot;: &amp;quot;0x0000000000000000000000000000000000000000000000000000000000000000&amp;quot;, &amp;quot;parentHash&amp;quot;: &amp;quot;0x0000000000000000000000000000000000000000000000000000000000000000&amp;quot;, &amp;quot;timestamp&amp;quot;: &amp;quot;0x00&amp;quot; }  mixhash
- 与nonce配合用于挖矿，由上一个区块的一部分生成的hash。注意他和nonce的设置需要满足以太坊的Yellow paper, 4.</description>
+      <description>以太坊启动测试链命令参考 ./geth --datadir /Volumes/exdisk/testnet --rpc --rpcaddr 0.0.0.0 --rpcport 8544 --port &#39;30302&#39; --rpcapi &#39;eth,web3,personal,net,miner,admin,debug,txpool&#39; --testnet --fast --maxpeers 50 --cache 1024 --ipcpath /goproject/src/github.</description>
     </item>
     
   </channel>

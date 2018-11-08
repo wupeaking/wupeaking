@@ -114,7 +114,8 @@
                 
                 
                 <div class="work-single-content">
-                    
+                    <p>go1.11对module有了新的支持， 在下一个版本可能对移除掉对GOPATH的支持。目前这个功能是根据一个环境变量GO111MODULE的值来进行控制的。
+</p>
 
 <h2 id="开启module特性">开启MODULE特性</h2>
 
@@ -189,7 +190,6 @@ replace (
 
 <p>Go modules支持通过<code>go mod -vendor</code>命令将某个module的所有依赖保存一份copy到root module dir的vendor下, 这个时候我们编译的时候依然可以使用vendor中的依赖。
 <code>go build -getmode=vendor main.go</code> 注意这个时候并不是说使用了GOPATH的依赖模式，只是说编译的时候查找go mod不在从$PATH/pkg/mod中 而是从根目录下的vendor中查找。</p>
-
                 </div>
                 
             </div>

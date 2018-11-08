@@ -12,7 +12,7 @@
     <!-- Mobile Specific Metas -->
     <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>wupenxin的个人主页</title>
+    <title>阅读Google论文MapReduce的理解</title>
     <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
 
     <!-- Twitter Bootstrs CSS -->
@@ -76,159 +76,148 @@
     </div>
 </section>
 
-
-<!-- Slider Section Start -->
-<section id="hero-area" style='background-image: url("https://wupeaking.github.io/images/slider.jpg");'>
+<!-- Page Header -->
+<section class="global-page-header">
     <div class="container">
         <div class="row">
-            <div class="col-md-12 text-center">
-                <div class="block wow fadeInUp" data-wow-delay=".3s">
-                    <!-- Slider -->
-                    <section class="cd-intro">
-                        <h1 class="wow fadeInUp animated cd-headline slide" data-wow-delay=".4s">
-                            <span>Hi~ 我的名字叫吴鹏鑫 & 我是一个</span>
-                            <br>
-                            <span class="cd-words-wrapper">
-                                
-                                    
-                                    <b class="is-visible">程序员</b>
-                                    
-                                
-                                    
-                                    <b>丈夫</b>
-                                    
-                                
-                                    
-                                    <b>准爸爸</b>
-                                    
-                                
-                            </span>
-                        </h1>
-                    </section>
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>阅读Google论文MapReduce的理解</h2>
+                    <div class="portfolio-meta">
+                        <span>2018-11-08</span>|
+                        <span> Category: mapreduce, google</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/mapreduce.jpeg" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    
+
+<h2 id="什么是mapreduce">什么是MapReduce</h2>
+
+<blockquote>
+<p>按着Google论文的说法, MapReduce是一种编程模型。 专为处理超大数据集的一种实现。 分为Map和Reduce两个阶段。 用户首先创建Map函数处理输入的<key, value>然后输出<key, set(value)>; 然后在创建Reduce函数对输入的<key, set(value)>进行合并 生成结果。</p>
+</blockquote>
+
+<h2 id="它有什么好处">它有什么好处</h2>
+
+<blockquote>
+<p>可以在大量的普通的计算机上并行执行， 将大数据分割成多个小数据块在各个普通计算机上进行并行运算快速得到运算结果。</p>
+</blockquote>
+
+<h2 id="可以用在哪些方面">可以用在哪些方面</h2>
+
+<ul>
+<li>计算URL访问频率:
+&gt; Map函数处理日志中的Web请求记录然后输出<url, set(l)>, reduce函数将相同url的value值累加起来产生<url, 记录总数>的结果</li>
+<li>倒排索引:
+&gt; Map 函数分析每个文档输出一个(词,文档号)的列表,Reduce 函数的输入是一个给定词的所有
+(词,文档号),排序所有的文档号,输出(词,list(文档号))。所有的输出集合形成一个简单的倒排索引,它 以一种简单的算法跟踪词在文档中的位置。</li>
+<li>分布式排序:
+&gt; Map 函数从每个记录提取 key,输出(key,record)。Reduce 函数不改变任何的值。</li>
+</ul>
+
+<h2 id="执行流程概括">执行流程概括</h2>
+
+<p><img src="/images/blog/MapReduce-detail.png" alt="MapReduce-detail.png" /></p>
+
+<h4 id="会有几个术语说明">会有几个术语说明</h4>
+
+<ul>
+<li>worker 表示运算程序</li>
+<li>master 应用程序调度者 负责分配任务</li>
+</ul>
+
+<p>###流程</p>
+
+<ol>
+<li>用户程序需要调用MapReduce库将输入文件分割成M个数据片段。 然后在机器集群中创建大量程序副本。其中有个特殊副本为master, 其他副本用于执行任务。</li>
+<li>然后master将M个Map任务和R个Reduce分配到一个空闲的worker上。</li>
+<li>被分配的Map任务(如编号m)开始读取m号的数据片段，解析对应的<key, value>然后调用用户自定义的map函数生成<key, value>并缓存到内存中。</li>
+<li>缓存的<key, list(value)>根据hash(key) mod R 运算分到R个区域写入本地磁盘上。master负责将这些存储位置传送给Reduce worker</li>
+<li>Reduce worker读取Map worker存储的数据首先对key进行排序将相同的key值进行聚合。<key, set(value)></li>
+<li>Reduce worker遍历排序后的中间数据将<key, set(value)>传递给用户自定义的Reduce函数，将结果追加到输出。</li>
+<li>所有Map和Reduce任务完成后, 则master唤醒用户任务执行完成。</li>
+</ol>
+
+<h3 id="一个大文件排序的例子">一个大文件排序的例子</h3>
+
+<p>假设有一个超大文件每一行均是一个数字， 使用MapReduce对这个大文件如何排序呢？ 按着上述流程我们一步步分析一下。</p>
+
+<ul>
+<li><p>首先将大文件分成M块 每一块的内容类似下面这样
+&gt; 100 897876
+101 7837
+102 4827482
+&hellip;.</p></li>
+
+<li><p>将每块内容在Map阶段进行计算会生成中间文件生成R份中间文件, 每份中间文件的内容类似下面这样 假设下面是第r块的内容
+&gt; 2728374 line-x
+83748247 line-q
+1     line-a
+2728374 line-d
+&hellip;</p></li>
+
+<li><p>Reduce从对应的块上读取内容，将其进行排序然后生成中间文件 假设下面是第r个Reduce任务执行生成的结果
+&gt; 1 (line-a)
+2728374 (line-x, line-d)
+83748247 (line-q)</p></li>
+
+<li><p>所有会生成R个类似上面的数据， 每一块数据是排好序的。</p></li>
+
+<li><p>接下来可以使用归并排序将所有的输出合并成一个排序的文件。</p></li>
+</ul>
+
+<h2 id="结论">结论</h2>
+
+<p>自己没有做过大数据相关的工作, 只是想了解一下MapReduce的大概是什么。 可能没有更深入的分析。 但是整个流程应该就是这样。 关于一些细节如如何进行任务粒度拆分， 如何进行容错处理， 如何catch用户程序崩溃问题， 如何对分布式系统进行问题追踪和调试待以后做相关工作在具体分析吧。</p>
+
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
                     
                     
+                    <h5>date</h5>
+                    <h6>November 20, 2018</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!-- Slider Section End -->
-
-
-
-<!-- About Section Start -->
-<section id="about">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 col-sm-6">
-                <div class="block wow fadeInLeft" data-wow-delay=".3s" data-wow-duration="500ms">
-                    <h2>关于我</h2>
-                    <p>一名程序员, 5年后端开发经验, 用过C，Python， Golang。  <br> 做过电力软件, 做过云计算, 做过在线租房, 现在是一名区块链开发者。 <br> 因为做过电力行业所以熟悉一些嵌入式的开发。 因为做过云计算所以熟悉docker和k8s。 因为做过在线租房所以用过Elasticsearch相关的搜索引擎。 因为现在在做区块链所以了解一些数字加密，P2P网络。 <br> 人生不易, 世事难料。 其生若浮, 其死若休。 </p>
-                </div>
-            </div>
-            <div class="col-md-6 col-sm-6">
-                <div class="block wow fadeInRight" data-wow-delay=".3s" data-wow-duration="500ms">
-                    <img src="https://wupeaking.github.io/images/about/about.jpg" alt="about-image">
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- About Section End -->
-
-
-
-<!-- Portfolio Section Start -->
-<section id="works" class="works">
-    <div class="container">
-        <div class="section-heading">
-            <h1 class="title wow fadeInDown" data-wow-delay=".3s">最近的文章</h1>
-            
-        </div>
-        <div class="row">
-            
-            <div class="col-md-4 col-sm-6">
-                
-                <figure class="wow fadeInLeft animated portfolio-item" data-wow-duration="500ms" data-wow-delay="0ms">
-                    <div class="img-wrapper">
-                        <img src="images/blog/mapreduce.jpeg" class="img-fluid" alt="this is a title">
-                        <div class="overlay">
-                            <div class="buttons">
-                                
-                                <a href="https://wupeaking.github.io/learn/mapreduce/">详情</a>
-                            </div>
-                        </div>
-                    </div>
-                    <figcaption>
-                        <h4>
-                            <a href="https://wupeaking.github.io/learn/mapreduce/">
-                                阅读Google论文MapReduce的理解
-                            </a>
-                        </h4>
-                        <p>
-                            
-                        </p>
-                    </figcaption>
-                </figure>
-            </div>
-            
-            <div class="col-md-4 col-sm-6">
-                
-                <figure class="wow fadeInLeft animated portfolio-item" data-wow-duration="500ms" data-wow-delay="300ms">
-                    <div class="img-wrapper">
-                        <img src="images/blog/gopher.png" class="img-fluid" alt="this is a title">
-                        <div class="overlay">
-                            <div class="buttons">
-                                
-                                <a href="https://wupeaking.github.io/learn/go111mod/">详情</a>
-                            </div>
-                        </div>
-                    </div>
-                    <figcaption>
-                        <h4>
-                            <a href="https://wupeaking.github.io/learn/go111mod/">
-                                Golang 1.11Module研究
-                            </a>
-                        </h4>
-                        <p>
-                            
-                        </p>
-                    </figcaption>
-                </figure>
-            </div>
-            
-            <div class="col-md-4 col-sm-6">
-                
-                <figure class="wow fadeInLeft animated portfolio-item" data-wow-duration="500ms" data-wow-delay="600ms">
-                    <div class="img-wrapper">
-                        <img src="images/blog/ethereum.png" class="img-fluid" alt="this is a title">
-                        <div class="overlay">
-                            <div class="buttons">
-                                
-                                <a href="https://wupeaking.github.io/learn/ethereum_priv_net/">详情</a>
-                            </div>
-                        </div>
-                    </div>
-                    <figcaption>
-                        <h4>
-                            <a href="https://wupeaking.github.io/learn/ethereum_priv_net/">
-                                以太坊私有网络创建
-                            </a>
-                        </h4>
-                        <p>
-                            
-                        </p>
-                    </figcaption>
-                </figure>
-            </div>
-            
-        </div>
-    </div>
-</section>
-<!-- Portfolio Section End -->
-
-
-
+<!-- work details part end -->
 
 
 

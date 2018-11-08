@@ -6,10 +6,23 @@
     <description>Recent content on wupenxin的个人主页</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh_CN</language>
-    <lastBuildDate>Wed, 07 Nov 2018 15:04:09 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 08 Nov 2018 12:13:29 +0800</lastBuildDate>
     
 	<atom:link href="https://wupeaking.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>阅读Google论文MapReduce的理解</title>
+      <link>https://wupeaking.github.io/learn/mapreduce/</link>
+      <pubDate>Thu, 08 Nov 2018 12:13:29 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/mapreduce/</guid>
+      <description>什么是MapReduce  按着Google论文的说法, MapReduce是一种编程模型。 专为处理超大数据集的一种实现。 分为Map和Reduce两个阶段。 用户首先创建Map函数处理输入的然后输出; 然后在创建Reduce函数对输入的进行合并 生成结果。
+ 它有什么好处  可以在大量的普通的计算机上并行执行， 将大数据分割成多个小数据块在各个普通计算机上进行并行运算快速得到运算结果。
+ 可以用在哪些方面  计算URL访问频率: &amp;gt; Map函数处理日志中的Web请求记录然后输出, reduce函数将相同url的value值累加起来产生的结果 倒排索引: &amp;gt; Map 函数分析每个文档输出一个(词,文档号)的列表,Reduce 函数的输入是一个给定词的所有 (词,文档号),排序所有的文档号,输出(词,list(文档号))。所有的输出集合形成一个简单的倒排索引,它 以一种简单的算法跟踪词在文档中的位置。 分布式排序: &amp;gt; Map 函数从每个记录提取 key,输出(key,record)。Reduce 函数不改变任何的值。  执行流程概括 会有几个术语说明  worker 表示运算程序 master 应用程序调度者 负责分配任务  ###流程
+ 用户程序需要调用MapReduce库将输入文件分割成M个数据片段。 然后在机器集群中创建大量程序副本。其中有个特殊副本为master, 其他副本用于执行任务。 然后master将M个Map任务和R个Reduce分配到一个空闲的worker上。 被分配的Map任务(如编号m)开始读取m号的数据片段，解析对应的然后调用用户自定义的map函数生成并缓存到内存中。 缓存的根据hash(key) mod R 运算分到R个区域写入本地磁盘上。master负责将这些存储位置传送给Reduce worker Reduce worker读取Map worker存储的数据首先对key进行排序将相同的key值进行聚合。 Reduce worker遍历排序后的中间数据将传递给用户自定义的Reduce函数，将结果追加到输出。 所有Map和Reduce任务完成后, 则master唤醒用户任务执行完成。  一个大文件排序的例子 假设有一个超大文件每一行均是一个数字， 使用MapReduce对这个大文件如何排序呢？ 按着上述流程我们一步步分析一下。
+ 首先将大文件分成M块 每一块的内容类似下面这样 &amp;gt; 100 897876 101 7837 102 4827482 &amp;hellip;.</description>
+    </item>
     
     <item>
       <title>Golang 1.11Module研究</title>

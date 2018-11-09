@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="4J_Y9YFEPjNLtGbox3HQ3kRL0lMfr9Mh1bwOTjKbCmE" />
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tendermint源码分析</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io/">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io/">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>Tendermint源码分析</h2>
+                    <div class="portfolio-meta">
+                        <span>2018-11-09</span>|
+                        <span> Category: Tendermint, 源码分析</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/Tendermint.jpeg" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    <p>Tendermint是基于ePBFT+POS共识算法的通用区块链平台。 通过对区块链整个流程的抽象出ABCI接口。 可以很容易的实现直接的区块链。
+</p>
+
+<ul>
+<li>Tendermint Core:</li>
+</ul>
+
+<blockquote>
+<p>实现了 p2p 网络; 在节点之间共享区块和交易;
+实现了拜占庭容错的共识算法, 确定了不更改改的交易顺序;</p>
+</blockquote>
+
+<ul>
+<li>BCI Interface, 具体的逻辑处理层, 可以基于不同的语言 (Golang, JS) 来实现; 在这一层实现交易的验证处理以及查询等操作.</li>
+</ul>
+
+<p>目前我正在实现阅读Tendermint的源码实现。 详细的源码分析可以查看我的<a href="https://github.com/wupeaking/tendermint_code_analysis">github项目</a></p>
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>11月9号, 2018</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

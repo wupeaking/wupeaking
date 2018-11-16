@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="4J_Y9YFEPjNLtGbox3HQ3kRL0lMfr9Mh1bwOTjKbCmE" />
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kubernets网络路由分析</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io/">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io/">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>Kubernets网络路由分析</h2>
+                    <div class="portfolio-meta">
+                        <span>2018-11-16</span>|
+                        <span> Category: k8s</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/k8s.png" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    
+
+<blockquote>
+<p>这是一份写于一年半之前的文章 归档到我的个人博客中</p>
+</blockquote>
+
+<h3 id="关于路由">关于路由</h3>
+
+<p>很多像我这样的网络小白，对于整个路由过程比较模糊。下面以一个简单的PING示例解释一下路由的整个过程。</p>
+
+<p>有两个原则需要记住：</p>
+
+<ul>
+<li><p>二层网络是通过MAC地址进行交换</p></li>
+
+<li><p>三层路由通过IP选路。</p></li>
+</ul>
+
+<p><img src="/images/blog/FDE4A305036F9FC611426DD440D9A883.png" alt="图片 1.png" /></p>
+
+<p>一个ICMP的以太网格式报文：</p>
+
+<p><code>|目的MAC|源MAC|目的IP|源IP|ICMP包|</code></p>
+
+<p>主机A发送一个ICMP包到主机B, 此时目的IP为10.10.0.2，源IP为192.168.0.2。 主机A发现，这个IP和我不在一个网段，那就需要进行IP选路了。此时它就只能把包发往直接的网关了(192.168.0.1) ，主机A和网关在同一个网段，通过MAC地址进行交换，所以目的MAC就是MACRA， 源Mac就是MACHOSTA。</p>
+
+<p>因此从主机A发出的一个以太网报文格式为：</p>
+
+<p><code>|MACRA|MACHOSTA|10.10.0.2|192.168.0.2|ICMP包</code></p>
+
+<p>路由器在接口A处收到以太网包进行分析，选出目的IP，根据自身的路由表发现，这个数据包要经过接口B发出啊。于是就在路由器接口B封装数据包</p>
+
+<p><code>|MACHOSTB|MACRB|10.10.0.2|192.168.0.2|ICMP包</code></p>
+
+<p>主机B在二层收到从路由器接口B发生的以太网进行解析发现目的IP是自己的，然后开始回复。首先发现目的IP是192.168.0.2.这货和我不是一个网段的啊，那我就把数据包先发给网关，让网关帮我邮递。于是封装出下面的以太网包：</p>
+
+<p><code>|MACRB|MACHOSTB|192.168.0.2|10.10.0.2|ICMP</code></p>
+
+<p>路由器从接口B收到数据包之后，同样进行分析之后知道自己需要通过接口A发出。于是封装的以太网包：</p>
+
+<p><code>|MACHOSA|MACRA|192.168.0.2|10.10.0.2|ICMP</code></p>
+
+<p>终于回复的数据包被主机A收到，整个ICMP过程完成。</p>
+
+<p>有一个非常重要的原则要记住：
+&gt; 在数据跳转的过程中，改变的是MAC，IP是始终是没有改变的。</p>
+
+<h3 id="关于nat">关于NAT</h3>
+
+<p>NAT是网络地址转换的意思，什么时候会用到它呢， 一个简单的例子就是我们平时上网用到路由器，</p>
+
+<p><img src="/images/blog/814A5A196EDB914113B887073A9C30DB.png" alt="图片2.png" /></p>
+
+<p>上图是我们家里常用的路由器连接示例，HOSTA和HOSTB连接到路由器的LAN口，当主机A访问8.8.8.8时，根据上面讲的路由过程，我们知道到达路由器的以太网包为：</p>
+
+<p><code>|MACRA|HOSTA|8.8.8.8|192.168.1.2|ICMP包</code></p>
+
+<p>此时路由器通过WAN口将报文发送到公网上去，按这常理它的数据包格式应该是：</p>
+
+<p><code>|下一跳路由MAC|路由器A的WAN口的MAC|8.8.8.8|192.168.1.2|ICMP包</code></p>
+
+<p>我们在深入思考一下，假设这样的一个数据包发送到公网上之后，确定还能按原路找回来吗？ 大家的路由器网关都是192.168.1.1 ，数据如果回来之后根本就不知道发送到哪一个路由器了。</p>
+
+<p>这个时候就出现了NAT的技术，如果想让回复的数据包能够返回，那么我就需要更改源IP地址啊，于是路由器在从WAN口路由出去之后更改源IP为WAN口的IP，同时记录NAT转换的信息，保证回复的数据能够投递到指定的目标。这种技术叫做SNAT。同理还有一个叫做DNAT，也就是更改目的地址IP。 后边会在介绍k8s路由过程中解释。 只需要记住SNAT是路由之后进行的，DNAT是路由之前进行的即可。</p>
+
+<h3 id="iptables原理">Iptables原理</h3>
+
+<p>在介绍k8s的网络之前，还需要介绍一下iptables的原理，因为k8s中用到了大量iptables的知识，iptables博大精深，本人也只是略懂一二。</p>
+
+<p>Iptables是Linux内核模块netfilter的应用程序，通过iptables这个应用程序来控制netfilter内核的行为。Linux的iptables默认是4表5链，当然也可以自定义自己的规则链。</p>
+
+<ul>
+<li><p>4表：
+&gt; nat， manage， raw， filter，</p></li>
+
+<li><p>5链：
+&gt; prerouting， input， output， forward, postrouting</p></li>
+</ul>
+
+<p>一般情况下我们只需要关心nat和filter这个两个表。Nat表可以控制非本地的网络包，filter可以控制路由到本地的数据包。</p>
+
+<p>不废话，先上图：(所有图均是自己绘制的，心疼自己几十秒)</p>
+
+<p><img src="/images/blog/AC797C6188579689AC3CC3AC78255A09.png" alt="图片 3.png" /></p>
+
+<p>上图表示了一个数据包在Linux的netfilter内核模块中流转的流程。可以说Linux的强大的网络功能让我非常震惊。惊呆了。</p>
+
+<h3 id="k8s的网络流程">K8s的网络流程</h3>
+
+<p>终于，终于到正题了，大家看看就行了，吾生也有涯，而知也无涯。以有涯随无涯，怠矣。</p>
+
+<p>当你使用kubernets的时候，可能会感到奇怪，为何我访问的集群的任意一个IP均可以访问到指定的应用。 为何在集群的机器上访问一个不存在的IP(clusterIP)却能够帮我路由到指定的pod，而且还是等概率的访问一个节点。</p>
+
+<p><img src="/images/blog/F08FEF72B09A144DB38EEF7CF8DE886A.png" alt="图片4.png" /></p>
+
+<p>上面是一张k8s的架构图(这张不是我画的)，我们只看proxy部分，kube-proxy是k8s的一个核心组件。每台机器上都运行一个kube-proxy服务，它监听API server中service和endpoint的变化情况，并通过iptables等来为服务配置负载均衡。 所以接下来我们通过例子结合iptable表中的规则来梳理整个流程。</p>
+
+<p>环境:</p>
+
+<pre><code class="language-shell">master01: 172.24.6.153 
+
+master02: 172.24.6.154
+
+master03: 172.24.6.145
+</code></pre>
+
+<p>我们以<code>kdcos-keystone</code>这个应用为例来分析访问流程。</p>
+
+<p><img src="/images/blog/E77C21ACA052180C29C30E10AD8632F1.png" alt="图片 5.png" /></p>
+
+<p>从图中可以看出， kdcos-keystone的clusterIP为10.0.0.10， 容器端口是8080， 集群端口是30808.</p>
+
+<p><code>Keystone</code>的pod分布：</p>
+
+<p><img src="/images/blog/84FC9ED7AD3A90D6F44FFD1C98D5447C.png" alt="图片 6.png" /></p>
+
+<p><code>master01</code>的路由表：</p>
+
+<p><img src="/images/blog/A3D14E9E91BE2155E1866682B917E7D1.png" alt="图片 7.png" /></p>
+
+<p>现在我们先不看iptable的规则，自己去考虑一下，如果我想在master01 上访问10.0.0.80(随便找一个不冲突的IP都行) 最终能够访问到master02上的keystone(10.254.59.219)应该怎么做呢？</p>
+
+<ol>
+<li><p>首先可以确定的是肯定是在iptable的nat表上进行添加规则。</p></li>
+
+<li><p>我们在集群内部访问的clusterIP是一个虚拟IP，最终要访问的IP是10.254.59.219. 所有肯定是要进行DNAT转换的。(这样数据包应该是从本地协议发出 会经过nat的OUTPUT和POSTROUTING链。看上图的iptable流程图即可明白)</p></li>
+
+<li><p>我们通过在集群外部访问nodeport，最终如果要访问到10.254.59.219，需要进行DNAT转换，这个和第二步一样，另外，在上面讲解NAT的时候说到，如果要想让消息能返回客户端，那就需要进行SNAT转换。如果实在觉得理解困难，可以把master01当做一个路由器，客户端就是一个主机。</p></li>
+</ol>
+
+<ul>
+<li><p>在集群中访问虚拟IP最终访问到keystone</p>
+
+<pre><code class="language-shell">iptables -t nat -I OUTPUT -p tcp -m comment --comment &quot;this is clusterip demo&quot; -d 10.0.0.80/32 --dport 8080 -j DNAT --to-destination 10.254.59.219:8080
+</code></pre></li>
+
+<li><p>让外部客户端访问nodeport最终访问到keystone</p></li>
+</ul>
+
+<pre><code class="language-shell">iptables -t nat -I POSTROUTING -p tcp -d 10.254.59.219 --dport 8080 -j MASQUERADE
+
+iptables -t nat -I PREROUTING -p tcp -m comment --comment &quot;this is nodeport demo&quot; --dport 40808 -j DNAT --to-destination 10.254.59.219:8080
+</code></pre>
+
+<p>这个时候 在集群的master01上访问10.0.0.80:8080 或者在外部访问172.24.6.153:408080，就会发现惊讶的发现原来k8s还能这样操作。是不是很惊喜。无图无真相：</p>
+
+<p>下图是在master01上访问10.0.0.80:8080 时设置的iptable规则。
+<img src="/images/blog/04B1B882982912E4D52FE2B761B4A6A7.png" alt="图片 8.png" /></p>
+
+<p>下图是让外部能够通过nodeport访问keystone设置的规则。</p>
+
+<p><img src="/images/blog/5AE66C83C1AC243F2B8DFE84ED4C1391.png" alt="图片 9.png" /></p>
+
+<p>在自己的电脑上访问nodeport：</p>
+
+<p><img src="/images/blog/E8AE81E9D289C5B537A057FDBBAF6355.png" alt="图片 10.png" /></p>
+
+<h3 id="留个问题">留个问题：</h3>
+
+<p>上面的iptable规则可以保证在master01上通过虚拟ip(10.0.0.80)访问到keystone，可以保证在外部访问172.24.6.153:8080访问到keystone，但是如果你尝试在master01(172.24.6.153)上通过访问172.24.6.153:40808到达keystone确是不行的。 不信？我截图给你看？
+<img src="/images/blog/164FBE65CE6F59C77FB749F2E81A3A21.png" alt="图片 11.png" /></p>
+
+<p>那你觉得应该如何设置才能在master01上通过自身IP也能访问到keystone呢？</p>
+
+<p>另外:</p>
+
+<p>MASQUERADE和SNAT的功能类似，只是SNAT需要明确指明源IP的的值，MASQUERADE会根据网卡IP自动更改，所以更实用一些。</p>
+
+<p>所以说，如果在开发过程中，想外部访问某个应用(比如redis)，但是呢碰巧这个应用的svc又没有开启nodeport，那你就可以模仿我刚才设置的iptable规则，从而达到不修改SVC也能通过外部应用访问。</p>
+
+<p>到这里，也许你大概明白了k8s的kube-proxy的工作原理了，总结起来就是通过更改iptable的规则让我们可以访问一个虚拟IP从而能够到达后端pod。如果看到这里还不是很了解的话，建议还是从头再看一下，因为下面分析的k8s生成的iptable链要比这个会更复杂一下。</p>
+
+<p>现在我们分析k8s的iptable的流程：</p>
+
+<h4 id="分析1-集群内部通过clusterip访问到pod">分析1： 集群内部通过clusterIP访问到pod。</h4>
+
+<p>上面我们分析过，首先这个数据包是通过本地协议发出的，然后需要更改NAT表，那看来k8s只能在OUTPUT这个链上来动手了。</p>
+
+<p>看下图：</p>
+
+<p><img src="/images/blog/56C803C77E7FB959464C686F7ED357C5.png" alt="图片 12.png" /></p>
+
+<p>到达OUTPUT链的包要过KUBE-SERVICES这个k8s自定义的链</p>
+
+<p><img src="/images/blog/D9DCBEBFD2639FA667E5DC7CCC656D4D.png" alt="图片 13.png" /></p>
+
+<p>上图就是KUBE-SERVICES 链，访问10.0.0.10:8080 可以匹配到上图的第一条红线的规则，注意第二条红线，下面会说到。</p>
+
+<p>匹配到10.0.0.10:8080的时候会跳转到KUBE-SVC-VZEERQ5BHBSZ5PRL这个链，那这个链又做了啥子呢？</p>
+
+<p><img src="/images/blog/EEF71C617C404561E55EF00A7CF49EF7.png" alt="图片 14.png" /></p>
+
+<p>看到上图的&ndash;mode random &ndash;probability 0.33332999982 了吗？它就是访问SVC时能够随机访问到后端POD的原因。</p>
+
+<p>因为我们后面有三个pod，所以会有三条链， 我们只分析其中一条。</p>
+
+<p><img src="/images/blog/42CE8AD46CF2D2D426D6B1C8FDC22131.png" alt="图片 15.png" /></p>
+
+<p>最终这个链做了两件事，跳转到KUBE-MARK-MASQ，我就不跳了，直接说结果就是给这个包打上标签，这个标签的用处，一会说。</p>
+
+<p>然后我们终于看到了对这个包进行了一次DNAT转换。 转到了10.254.59.212:8080上面了。</p>
+
+<p>这个OUTPUT走完之后，它就该到POSTROUTING链了。
+<img src="/images/blog/EBF872B954540370575817E1FAFAB605.png" alt="图片 16.png" /></p>
+
+<p>跳转到KUBE-POSTROUTING链，这个链只做了一个事，就是对打上了标签的包进行SNAT转换。<code>这就引入了一个问题，在一个pod访问一个clusterIP的时候，如果这个clusterIP的DNAT目标是自己的话，看到的IP却是自己宿主机的IP</code>。还有一点大家可能会有疑问，这个&ndash;mark 0x4000/0x4000是什么鬼，就是对匹配这个标签的数据包进行SNAT，上面说到的KUBE-MARK-MASQ就是给数据包打上了这样的一个标签。</p>
+
+<p><img src="/images/blog/5D2435F1EB475CDD18517505A932AAA7.png" alt="图片 17.png" /></p>
+
+<p>这样一个访问clusterIP最终访问到pod的流程就算走完了。</p>
+
+<h4 id="分析2-下面我们来分析通过外部nodeport访问后端pod的流程">分析2： 下面我们来分析通过外部nodeport访问后端pod的流程。</h4>
+
+<p>根据iptable的流程我们知道，首先我们应该对nat表的PREROUTING链动手脚。看看k8s做了啥？</p>
+
+<p><img src="/images/blog/4A51894FA16FA4D8440D82DB13865313.png" alt="图片 18.png" /></p>
+
+<p>对，你没看错，这货又把它跳到了KUBE-SERVICES这个链上去了，但是上面我们知道，这回我是通过nodeport访问的，你根本匹配不上啊，不错确实匹配不上，还记得我说的第二根红线吗？忘了？在贴下上面的图。</p>
+
+<p><img src="/images/blog/D9DCBEBFD2639FA667E5DC7CCC656D4D.png" alt="图片 19.png" /></p>
+
+<p>那既然你们匹配不上那就给我跳转到KUBE-NODEPORTS链上来。</p>
+
+<p><img src="/images/blog/FB3C2E2DF146B16BC1D65A0DDAB6FF11.png" alt="图片 20.png" /></p>
+
+<p>在这个KUBE-NODEPORTS最后还是调到之前的KUBE-SVC-VZEERQ5BHBSZ5PRL上，打上标签，DNAT转换，SNAT转换。完成。</p>
+
+<h3 id="另外">另外</h3>
+
+<p>在最开始我提到了一个问题，在集群上使用nodeport却访问不了后端pod， 那是因为我们没有在OUTPUT链设置匹配nodeport的包进行DNAT转换呀，那k8s做了吗？ 当然了，反正不管你是PREROUTING还是OUTPUT链，我都给你跳到KUBE-SERVICE， 到了KUBE-SERVICE匹配不上我就给你跳到KUBE-NODEPORTS，这就解决了不管是那种情况，无论是访问clusterIP，还是nodeport最终都能访问到了后端pod</p>
+
+<p>总之： Linux的网络功能复杂且强大，且学且珍惜！</p>
+
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>11月7号, 2018</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

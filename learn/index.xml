@@ -12,6 +12,16 @@
     
     
     <item>
+      <title>以太坊智能合约创建部署调用流程详解</title>
+      <link>https://wupeaking.github.io/learn/smartcode/</link>
+      <pubDate>Tue, 27 Nov 2018 17:23:12 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/smartcode/</guid>
+      <description>&lt;p&gt;以太坊被称为区块链2.0的一个主要的原因是因为他有一个图灵完备的evm, 可以在节点上执行智能合约代码。 但是一个智能合约代码又是在以太坊节点上工作的呢。 让我们探究一番。
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Kubernets网络路由分析</title>
       <link>https://wupeaking.github.io/learn/k8s_network/</link>
       <pubDate>Fri, 16 Nov 2018 10:39:54 +0800</pubDate>

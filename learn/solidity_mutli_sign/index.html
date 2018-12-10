@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="4J_Y9YFEPjNLtGbox3HQ3kRL0lMfr9Mh1bwOTjKbCmE" />
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>使用solidity实现以太坊多签功能</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io/">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io/">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>使用solidity实现以太坊多签功能</h2>
+                    <div class="portfolio-meta">
+                        <span>2018-12-10</span>|
+                        <span> Category: solidity, 多重签名, multi-signature</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/solidity_mutlisign.png" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    <p>虽然以太坊没有提供直接的多重签名的功能， 但是号称区块链2.0的公链平台可以具有图灵完备的智能合约运行平台。 下面我就使用solidity和golang给大家暂时一下如何用智能合约来实现以太坊的多签功能。</p>
+
+<p></p>
+
+<h3 id="前言">前言</h3>
+
+<p>玩过比特币交易的大概都通过多重签名的功能， 比特币的多重签名一般有MS和P2SH两种类型。 多重签名可以实现N:M的的交易。 但是以太坊是一个内置智能合约的区块链平台， 没有直接内置比特币这种多签交易的功能。 那是不是就不能实现多重签名的功能呢？既然以太坊是号称区块链2.0，有图灵完备的智能合约平台， 自然就可以实现多签功能， 废话不说让我来展示给大家看。</p>
+
+<h3 id="准备实现的功能">准备实现的功能</h3>
+
+<ol>
+<li>实现可以设置任意N:M的签名交易
+一般的比特币多签交易在最开始设置完N:M的多签之后是不能更改的, 我们既然是可以写代码当然是可以实现N:M是动态变化的。</li>
+<li>实现任意修改可以发起交易的多个签名者</li>
+<li>可以随时控制交易暂停或者启动</li>
+<li>实现权限控制</li>
+</ol>
+
+<h3 id="设计思路">设计思路</h3>
+
+<ol>
+<li><p>对于以太坊如果想实现多签转账的话，那么拥有token的账户肯定不能是个人账户了，因为只有合约账户才能受代码控制，这样才能实现多签功能。</p></li>
+
+<li><p>其次既然合约账户最终拥有了token，如果想要合约账户可以转账给其他账户，这个时候就必须做到可以确认控制合约转账的账户是特定的用户，也即是N个签名者。那么如何才能确认发起交易的用户不是伪造的呢？ 那么我们就需要用到非对称加密的功能了。</p></li>
+
+<li><p>最后如果我们验证多签用户通过， 那么如何才能把合约账户的Token转移到其他账户呢， 这里就要用到ERC20的接口协议了， 只要我们在合约中定义ERC20接口， 并且在初始化时指向具体的token合约地址即可以调用具体合约实现转账的功能。</p></li>
+</ol>
+
+<h3 id="核心代码实现">核心代码实现</h3>
+
+<ul>
+<li>验证签名原理
+在solidity中有一个内置函数为<code>ecrecoverDecode</code>可以根据待签名内容和签名内容恢复出地址， 所以我们只要通过恢复的地址来确认该地址是不是合约账户指定的多签账户中的一个。</li>
+</ul>
+
+<pre><code class="language-solidity">  function recoverAddress(bytes32 hashValue, string signValue) internal returns (address){
+      bytes memory signedString = hexStr2bytes(signValue);
+      bytes32  r = bytesToBytes32(slice(signedString, 0, 32));
+      bytes32  s = bytesToBytes32(slice(signedString, 32, 32));
+      byte  v = slice(signedString, 64, 1)[0];
+      return ecrecoverDecode(hashValue, r, s, v);
+  }
+  
+    //将原始数据按段切割出来指定长度
+  function slice(bytes memory data, uint start, uint len)  internal returns (bytes){
+    bytes memory b = new bytes(len);
+
+    for(uint i = 0; i &lt; len; i++){
+      b[i] = data[i + start];
+    }
+
+    return b;
+  }
+
+  //使用ecrecover恢复公匙
+  function ecrecoverDecode(bytes32 hashValue, bytes32 r, bytes32 s, byte v1) internal returns (address){
+     uint8 v = uint8(v1) + 27;
+    return ecrecover(hashValue, v, r, s);
+  }
+</code></pre>
+
+<ul>
+<li>进行转账的实现
+定义ERC20的接口, 当转账时只需要调用transfer即可实现转账。</li>
+</ul>
+
+<pre><code class="language-solidity">  contract ERC20 {
+
+    uint256 public totalSupply;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    function balanceOf(address who) public view returns (uint256);
+    function transfer(address to, uint256 value) public returns (bool);
+
+    function allowance(address owner, address spender) public view returns (uint256);
+    function approve(address spender, uint256 value) public returns (bool);
+    function transferFrom(address from, address to, uint256 value) public returns (bool);
+
+  }
+
+    function _transfer(address to, uint256 value) private returns(bool){
+        return _erc20.transfer(to, value);
+    }
+</code></pre>
+
+<ul>
+<li>整个多签转账的核心逻辑如下</li>
+</ul>
+
+<pre><code class="language-solidity">      function transfer(address _to, uint256 _value, string _txid, string _signs) onlyNoPause()  public returns (bool) {
+        uint256 balance = _erc20.balanceOf(this);
+        // 分隔多个签名 因为多重签名应该有多个账户对同一个内容的签名内容
+        strings.slice memory s = _signs.toSlice();                
+        strings.slice memory delim = &quot;,&quot;.toSlice();                            
+        string[] memory allsigns = new string[](s.count(delim)+1);                  
+        for (uint i = 0; i &lt; allsigns.length; i++) {                              
+           allsigns[i] = s.split(delim).toString();                               
+        }
+
+        // 进行条件判断
+        if (balance&lt;=_value) {
+            emit TransferError(_txid, 400, _to, _value);
+            return false;
+        }
+        // 必须要求进行交易的ID不可重复 
+        if (isExistTx[_txid]) {
+            emit TransferError(_txid, 403, _to, _value);
+            return false;
+        }
+
+        if (allsigns.length &lt; minSenderNum) {
+            emit TransferError(_txid, 401, _to, _value);
+            return false;
+        }
+
+        // 对参数进行编码
+        bytes32  hashValue =  keccak256(abi.encode(_to, &quot;&amp;&quot;, _value, &quot;&amp;&quot;, _txid));
+        for(i=0; i&lt;minSenderNum; i++) {
+           address fromAddr = recoverAddress(hashValue, allsigns[i]);
+          if (!canSenders[fromAddr]) {
+              emit TransferError(_txid, 402, _to, _value);
+              return false;
+          }
+        }
+        isExistTx[_txid] = true;
+        emit TransferError(_txid, 200, _to, _value);
+        return _transfer(_to, _value);
+    }
+</code></pre>
+
+<h3 id="使用truffle进行调试">使用truffle进行调试</h3>
+
+<ol>
+<li>启动ganache 默认端口为7545</li>
+
+<li><p>修改truffle-config.js文件</p>
+
+<pre><code class="language-js">  module.exports = {
+  networks: {
+    development: {
+      host: &quot;127.0.0.1&quot;,
+      port: 7545,
+      network_id: &quot;*&quot; // Match any network id
+    },
+    priv: {
+      host: &quot;127.0.0.1&quot;,
+      port: 8542,
+      network_id: &quot;*&quot;, // Match any network id
+      gas: 0x2fefd8
+    },
+    test : {
+      host: &quot;172.16.129.108&quot;,
+      port: 8544,
+      gas: 0x2fefd8,
+      network_id: &quot;*&quot; // Match any network id
+    }
+  }
+};
+</code></pre></li>
+
+<li><p>在migrations问价下添加部署文件2_deploy.js</p>
+
+<pre><code class="language-js">  var Token = artifacts.require(&quot;./TokenERC20&quot;);
+  var ms = artifacts.require(&quot;./MultiSigAcount&quot;)
+      
+  module.exports = function(deployer) {
+    deployer.deploy(Token, 1000000000000, &quot;TokenTest&quot;, &quot;t&quot;, 4).then(function(){
+      return deployer.deploy(ms, Token.address);
+    })
+  }
+</code></pre></li>
+
+<li><p>开始部署到私有节点中</p>
+
+<pre><code class="language-shell">truffle migrate --network=development --reset
+</code></pre></li>
+
+<li><p>启动控制台进行调试</p></li>
+</ol>
+
+<pre><code class="language-shell">  truffle console --network=development
+  truffle(development)&gt; var token;
+  undefined
+  truffle(development)&gt; var mutisign;
+  undefined
+  truffle(development)&gt; TokenERC20.deployed().then(function(i){token=i});
+  undefined
+  truffle(development)&gt; MultiSigAcount.deployed().then(function(i){mutisign=i})
+  undefined
+  truffle(development)&gt; token.transfer(mutisign.address, 10000000)
+  
+  // 监听转账错误事件
+  truffle(development)&gt; var event = mutisign.TransferError()
+  
+  truffle(development)&gt; event.watch(function(err, result){console.log(result.args)})
+  
+  mutisign.transfer(&quot;0xb9b7e0cb2edf5ea031c8b297a5a1fa20379b6a0a&quot;, 100, &quot;qwerty&quot;, &quot;a0cf8e911765596151d9826c51fbb3dfede93904fe6772442fd1ea5d589efe0d28d82e97516c2ceee00ecd2e6d0acafc1b5721dda499724900ba7feac08245e401,54b99da440a9f7dd1fd6f65ea082229314977f6bf238e9ea1dc0959f336996475e6bf94b7104bb9a93ce1affac16853a42d8311892322fa72ff511bf6db3b2cd01&quot;)
+
+</code></pre>
+
+<h3 id="如何使用golang实现调用方的交易签名">如何使用golang实现调用方的交易签名</h3>
+
+<p>在上面的智能合约多签验证中， 我们首先使用了solidity内置的<code>abi.encode</code>对交易的参数进行了编码然后再进行了sha/keccak256的hash运算，最后恢复出地址。 所以如果想要恢复成功必须要求调用方做相同的步骤， 整个golang的核心代码如下:</p>
+
+<pre><code class="language-go">      func main() {
+      // 需要进行编码的参数为// _to, &quot;&amp;&quot;, _value, &quot;&amp;&quot;, _txid
+      // 所对应的参数类型为address, string, uint256, string, string
+    	uint256Ty, _ := abi.NewType(&quot;uint256&quot;)
+    	stringTy, _ := abi.NewType(&quot;string&quot;)
+    	addressTy, _ := abi.NewType(&quot;address&quot;)
+    	
+    	arguments := abi.Arguments{
+    		{
+    			Type: addressTy,
+    		},
+    		{
+    			Type: stringTy,
+    		},
+    		{
+    			Type: uint256Ty,
+    		},
+    		{
+    			Type: stringTy,
+    		},
+    		{
+    			Type: stringTy,
+    		},
+    	}
+    
+      // 对参数进行编码 此编码出的结果与solidity对应的abi.encode结果一致
+    	bytes, _ := arguments.Pack(
+    		common.HexToAddress(&quot;0xb9b7e0cb2edf5ea031c8b297a5a1fa20379b6a0a&quot;),
+    		&quot;&amp;&quot;,
+    		big.NewInt(100),
+    		&quot;&amp;&quot;,
+    		&quot;qwerty&quot;,
+    	)
+      
+      // 进行hash运算
+    	var buf []byte
+    	hash := sha3.NewKeccak256()
+    	hash.Write(bytes)
+    	buf = hash.Sum(buf)
+    	// 加载私钥 进行签名
+    	priKey, _ := crypto.HexToECDSA(privkeyStr1)
+    	sig, _ := crypto.Sign(buf, priKey)
+    	fmt.Printf(&quot;签名内容为: %0x\n&quot;, sig)
+    }
+</code></pre>
+
+<h3 id="总结">总结</h3>
+
+<p>整个使用以太坊的智能合约实现多签的功能核心部分就是这么多， 我已经在ropsten网络部署了此智能合约并进行了相关的测试。 整个测试中发现当多签数量为1个时进行的转账gas消耗大约在25W左右，2个时大约在31W左右。 所以优化的任务就留给有缘人了。</p>
+
+<p>多签合约的地址为:<code>0x23d0fe96aa989bf7ff76fc34901d4a5633792a2e</code></p>
+
+<p>ERC20代币地址为: <code>0x07b6cDc7df9A1ff1eD97FB40531f2BB4bb32499B</code></p>
+
+<p>具体详细的智能合约和golang代码可以查看的我的<a href="https://github.com/wupeaking/eth-Multi-signature">github</a></p>
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>12月10号, 2018</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

@@ -6,10 +6,21 @@
     <description>Recent content on wupenxin的个人主页</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh_CN</language>
-    <lastBuildDate>Tue, 27 Nov 2018 17:23:12 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 10 Dec 2018 11:12:52 +0800</lastBuildDate>
     
 	<atom:link href="https://wupeaking.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用solidity实现以太坊多签功能</title>
+      <link>https://wupeaking.github.io/learn/solidity_mutli_sign/</link>
+      <pubDate>Mon, 10 Dec 2018 11:12:52 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/solidity_mutli_sign/</guid>
+      <description>&lt;p&gt;虽然以太坊没有提供直接的多重签名的功能， 但是号称区块链2.0的公链平台可以具有图灵完备的智能合约运行平台。 下面我就使用solidity和golang给大家暂时一下如何用智能合约来实现以太坊的多签功能。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>以太坊智能合约创建部署调用流程详解</title>

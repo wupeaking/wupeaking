@@ -148,8 +148,10 @@
 
 <ul>
 <li>验证签名原理
-在solidity中有一个内置函数为<code>ecrecoverDecode</code>可以根据待签名内容和签名内容恢复出地址， 所以我们只要通过恢复的地址来确认该地址是不是合约账户指定的多签账户中的一个。</li>
+<br /></li>
 </ul>
+
+<p>在solidity中有一个内置函数为<code>ecrecoverDecode</code>可以根据待签名内容和签名内容恢复出地址， 所以我们只要通过恢复的地址来确认该地址是不是合约账户指定的多签账户中的一个。</p>
 
 <pre><code class="language-solidity">  function recoverAddress(bytes32 hashValue, string signValue) internal returns (address){
       bytes memory signedString = hexStr2bytes(signValue);
@@ -179,8 +181,10 @@
 
 <ul>
 <li>进行转账的实现
-定义ERC20的接口, 当转账时只需要调用transfer即可实现转账。</li>
+<br /></li>
 </ul>
+
+<p>定义ERC20的接口, 当转账时只需要调用transfer即可实现转账。</p>
 
 <pre><code class="language-solidity">  contract ERC20 {
 
@@ -278,7 +282,7 @@
 };
 </code></pre></li>
 
-<li><p>在migrations问价下添加部署文件2_deploy.js</p>
+<li><p>在migrations文件夹下添加部署文件2_deploy.js</p>
 
 <pre><code class="language-js">  var Token = artifacts.require(&quot;./TokenERC20&quot;);
   var ms = artifacts.require(&quot;./MultiSigAcount&quot;)
@@ -372,7 +376,7 @@
 
 <p>整个使用以太坊的智能合约实现多签的功能核心部分就是这么多， 我已经在ropsten网络部署了此智能合约并进行了相关的测试。 整个测试中发现当多签数量为1个时进行的转账gas消耗大约在25W左右，2个时大约在31W左右。 所以优化的任务就留给有缘人了。</p>
 
-<p>多签合约的地址为:<code>0x23d0fe96aa989bf7ff76fc34901d4a5633792a2e</code></p>
+<p>多签合约的地址为:<a href="https://ropsten.etherscan.io/address/0x23d0fe96aa989bf7ff76fc34901d4a5633792a2e">0x23d0fe96aa989bf7ff76fc34901d4a5633792a2e</a> (源码已经验证)</p>
 
 <p>ERC20代币地址为: <code>0x07b6cDc7df9A1ff1eD97FB40531f2BB4bb32499B</code></p>
 

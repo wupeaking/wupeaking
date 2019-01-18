@@ -13,7 +13,7 @@
     <!-- Mobile Specific Metas -->
     <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>404 Page not found</title>
+    <title>使用Linux的veth和iptable实现容器跨主机通信</title>
     <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
 
     <!-- Twitter Bootstrs CSS -->
@@ -78,23 +78,161 @@
 </section>
 
 
-
-    <section class="moduler wrapper_404">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="text-center">
-                        <h1 class="wow fadeInUp animated cd-headline slide" data-wow-delay=".4s">404</h1>
-                        <h2 class="wow fadeInUp animated" data-wow-delay=".6s">Opps! You have some problems</h2>
-                        <p class="wow fadeInUp animated" data-wow-delay=".9s">The page you are looking for was moved, removed, renamed or might never existed.</p>
-                        <a href="index.html" class="btn btn-dafault btn-home wow fadeInUp animated hvr-bounce-to-right" data-wow-delay="1.1s">Go Home</a>
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>使用Linux的veth和iptable实现容器跨主机通信</h2>
+                    <div class="portfolio-meta">
+                        <span>2019-01-18</span>|
+                        <span> Category: linux, veth, container</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/linux_veth_network.jpg" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    
 
+<h3 id="简介">简介</h3>
+
+<p>linux具有非常强大的网络功能, 今天准备使用Linux的veth网络设备来实现容器之间的跨主机通讯方式。</p>
+
+<h3 id="拓扑如下">拓扑如下</h3>
+
+<p><img src="/images/blog/linux_veth.png" alt="图片 1.png" /></p>
+
+<p>从上图我们可以看出:
+1. 主机host1与host2在同一个网段，可以直接通过交换机进行通信。
+2. 两个主机的容器具有不同的ip地址。
+那么如何通过Linux的veth和iptable表实现跨主机通讯呢？</p>
+
+<p>分析:
+veth类似于现实中的网线， 我们只要将veth的一段接入container0命名空间， 一端接入默认的全局命名空间至少可以实现将数据包从容器转移到了主机的网络栈中。 数据包流入主机网络栈之后， 需要将数据路由到另外一个主机上， 因此主机必须要开启路由转发功能。</p>
+
+<h3 id="实践">实践</h3>
+
+<p>现在host1上执行</p>
+
+<pre><code class="language-shell"># 首先开启路由转发功能 这一步非常重要
+&gt; echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+# 为了方便 我们创建一个网络命名空间
+&gt; ip netns add container0
+
+# 创建veth peer 把容器和主机进行联通
+&gt; ip link add vethc00 type veth peer name vethc01
+
+&gt; ip link set vethc00 netns container0
+
+&gt; ip link set vethc01 up
+
+&gt; ip netns exec container0 ip link set vethc00 up
+
+# 接下来 给container0赋予ip地址
+&gt; ip netns exec container0 ip address add 11.12.11.121/24 dev vethc00
+
+# 这个时候 我们发现container0这个容器中会有一个默认的同网段的路由 既然我们想把数据包从vethc00
+# 转移出去 那么需要设置所有的数据均路由到一个vethc01上即可
+&gt; ip netns exec container0 ip route del 11.12.11.0/24 dev vethc00
+&gt; ip netns exec container0 ip route add 166.0.0.1 dev  vethc00
+&gt; ip netns exec container0 ip route add default  via 166.0.0.1
+
+# 此时需要开启vethc01的ARP代理功能 因为只有这样 才能把所有以太包从container0转移到默认空间的网络栈中
+&gt; echo 1 &gt; /proc/sys/net/ipv4/conf/vethc01/procy_arp
+
+# 在主机上添加如下的路由表
+
+# 意思很明确 如果是想访问container0 数据包应该投递给vethc01
+&gt; ip route add 11.12.11.121 dev vethc01
+
+# 如果是访问host2的容器 container0 应该先跳到host2
+&gt; ip route add 12.11.12.3 via 192.168.9.4 dev eth0
+
+</code></pre>
+
+<p>执行完上面这些步骤， 你会发现host1的container0甚至连host2都联通不了。 这是因为我们还少一步SNAT没有做。
+此时如果从host1/container0访问host2时，到达host2的源ip是11.12.11.121, 这样的话host2根本回复不了到host1上
+去。
+接下来就是iptable需要做的事情了。
+在使用iptable表之前， 建议使用一个没有完全干净的iptable表， 并且设置默认链均是accept的状态。</p>
+
+<pre><code class="language-shell">&gt; iptables -F -t nat
+&gt; iptables -F -t filter
+
+&gt; iptables -P INPUT ACCEPT  -t filter
+&gt; iptables -P OUTPUT ACCEPT -t filter
+&gt; iptables -P FORWARD ACCEPT -t filter
+
+&gt; iptables -P INPUT ACCEPT  -t nat
+&gt; iptables -P OUTPUT ACCEPT -t nat
+&gt; iptables -P FORWARD ACCEPT -t nat
+&gt; iptables -P PREROUTING ACCEPT -t nat
+&gt; iptables -P POSTROUTING ACCEPT -t nat
+
+## 进行snat转换
+iptables -t nat -A POSTROUTING -s 11.12.11.121 -o eth0 -j MASQUERADE
+</code></pre>
+
+<p>这个时候我们再次从container0访问host2即是联通的</p>
+
+<pre><code class="language-shell">&gt; ip netns exec container0 ping 192.168.9.4
+</code></pre>
+
+<p>但是此时如果host1/container0-&gt;host2/container0却是不通的, 这是因为host2还没有设置访问12.11.12.3的路由表。
+此时我们只要按着上述的步骤在host2进行类似的操作即可实现主机之间的跨网段访问。</p>
+
+<h3 id="总结">总结</h3>
+
+<p>上述过程看上去简单,其实涉及的内容其实很多的， 至少要了解整个网络流转的过程， 了解网络命名空间的概念， 了解Linux的veth设备。 并且要明白iptable的四表五链在整个网络协议栈的位置。 所以其实网络问题个人认为是一个很复杂和涉及内容比较多的概念。 这里这是简单记录了自己在实践过程中成功的步骤。 其实docker上的calico的网络基本原理就是上述这个样子的。 自动的为容器创建veth， 刷新路由表， 更新IPtables表。</p>
+
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>1月18号, 2019</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
 
 
 

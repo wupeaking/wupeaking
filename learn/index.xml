@@ -12,6 +12,18 @@
     
     
     <item>
+      <title>使用Linux的veth和iptable实现容器跨主机通信</title>
+      <link>https://wupeaking.github.io/learn/linux_veth_conntection/</link>
+      <pubDate>Fri, 18 Jan 2019 14:37:51 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/linux_veth_conntection/</guid>
+      <description>简介 linux具有非常强大的网络功能, 今天准备使用Linux的veth网络设备来实现容器之间的跨主机通讯方式。
+拓扑如下 从上图我们可以看出: 1. 主机host1与host2在同一个网段，可以直接通过交换机进行通信。 2. 两个主机的容器具有不同的ip地址。 那么如何通过Linux的veth和iptable表实现跨主机通讯呢？
+分析: veth类似于现实中的网线， 我们只要将veth的一段接入container0命名空间， 一端接入默认的全局命名空间至少可以实现将数据包从容器转移到了主机的网络栈中。 数据包流入主机网络栈之后， 需要将数据路由到另外一个主机上， 因此主机必须要开启路由转发功能。
+实践 现在host1上执行</description>
+    </item>
+    
+    <item>
       <title>使用solidity实现以太坊多签功能</title>
       <link>https://wupeaking.github.io/learn/solidity_mutli_sign/</link>
       <pubDate>Mon, 10 Dec 2018 11:12:52 +0800</pubDate>

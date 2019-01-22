@@ -6,10 +6,20 @@
     <description>Recent content on wupenxin的个人主页</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh_CN</language>
-    <lastBuildDate>Fri, 18 Jan 2019 14:37:51 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 22 Jan 2019 10:47:57 +0800</lastBuildDate>
     
 	<atom:link href="https://wupeaking.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>以太坊君士坦丁堡升级失败原因分析</title>
+      <link>https://wupeaking.github.io/learn/eth_junshitandingbao_bug/</link>
+      <pubDate>Tue, 22 Jan 2019 10:47:57 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/eth_junshitandingbao_bug/</guid>
+      <description>&lt;p&gt;ethereum官方在1月16日发布了一个紧急修复版本, 需要覆盖掉之前的特殊版本v1.8.20 这也就意味着君士坦丁堡版本的硬分叉失败了。 下面我们来看看是什么bug导致此次升级失败。
+&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>使用Linux的veth和iptable实现容器跨主机通信</title>

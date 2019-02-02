@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh_CN">
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="4J_Y9YFEPjNLtGbox3HQ3kRL0lMfr9Mh1bwOTjKbCmE" />
+    <meta name="generator" content="Hugo 0.50" />
+    
+    <!-- Mobile Specific Metas -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>使用Linux的bridge设备和iptable功能实现容器之间跨主机通信</title>
+    <link rel="icon" href="https://wupeaking.github.io/images/favicon.png">
+
+    <!-- Twitter Bootstrs CSS -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.css">
+    <!-- Ionicons Fonts Css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/ionicons/ionicons.min.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/animate-css/animate.css">
+    <!-- Hero area slider css-->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/slider/slider.css">
+    <!-- owl craousel css -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/owl-carousel/owl.theme.css">
+    <!-- Fancybox -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.css">
+    <!-- hover -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/plugins/hover/hover-min.css">
+    <!-- template main css file -->
+    <link rel="stylesheet" href="https://wupeaking.github.io/css/style.css">
+</head>
+
+<body>
+
+<section class="top-bar animated-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <a class="navbar-brand" href="https://wupeaking.github.io/">
+                    
+                        <img src="https://wupeaking.github.io/images/logo.png" alt="logo">
+                    
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://wupeaking.github.io/">首页</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/learn">编程</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/artics">随笔</a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about">关于</a>
+                            </li>
+                            
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Page Header -->
+<section class="global-page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <h2>使用Linux的bridge设备和iptable功能实现容器之间跨主机通信</h2>
+                    <div class="portfolio-meta">
+                        <span>2019-02-02</span>|
+                        <span> Category: linux, bridge, container</span>|
+                        <span> website:
+                            <a href=""></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- work details part start -->
+<section class="work-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="work-single-image">
+                    
+                    <img class="img-fluid w-100" src="https://wupeaking.github.io/images/blog/linux_veth_network.jpg" alt="work-single-image">
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                
+                
+                <div class="work-single-content">
+                    <p>如果玩过docker的网络肯定了解各种为了实现docker容器之间的跨主机方案。 比如docker自带的overlay到weave，fannel，calico等。 有通过GRE格式的overlay进行跨主机通信，或者通过主机路由形式的。 今天我们通过Linux自带的bridge功能来实现容器的跨主机通信。
+</p>
+
+<h1 id="使用linux的bridge设备和iptable功能实现容器之间跨主机通信">使用Linux的bridge设备和iptable功能实现容器之间跨主机通信</h1>
+
+<hr />
+
+<p>如果玩过docker的网络肯定了解各种为了实现docker容器之间的跨主机方案。 比如docker自带的overlay到weave，fannel，calico等。 有通过GRE格式的overlay进行跨主机通信，或者通过主机路由形式的。 今天我们通过Linux自带的bridge功能来实现容器的跨主机通信。</p>
+
+<h3 id="拓扑图">拓扑图</h3>
+
+<p><img src="/images/blog/linux_bridge.png" alt="图片 1.png" /></p>
+
+<p>host1和host2分别有两个网口, eth0用于进行外部通信, eth1网卡之间通过交换机连接。 每个主机上都有三个容器, 三个容器具有不同网段的ip地址。 host1和host2上均添加了网桥设备。 并且网桥上配置了ip地址，然后将ETH1网卡接入了网桥设备上， 因此该网卡是类似的三层交换机。 也就是此时host1和host2之间已经可以通过内网联通了。</p>
+
+<p>现在我们就先创建主机上的容器网络， 为了方便我们只创建netns来代替容器网络。</p>
+
+<h3 id="实践">实践</h3>
+
+<pre><code class="language-shell">1. 必须开启主机的路由转发功能
+host1: # echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+host2: # echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+2. 创建虚拟网桥 并配置网桥地址
+host1:
+# ip link add bridge0 type bridge
+# ip link set bridge0 up
+# ip address add 172.17.1.1/24 dev bridge0
+
+host2:
+# ip link add bridge0 type bridge
+# ip link set bridge0 up
+# ip address add 172.17.1.2/24 dev bridge0
+
+3. 检查是否创建网桥成功
+host1:
+# ping 172.17.1.2
+
+4. 创建network namespace 模拟docker网络
+host1:
+# ip netns add c0
+# ip netns add c1
+# ip netns add c2
+
+host2:
+# ip netns add c0
+# ip netns add c1
+# ip netns add c2
+
+5. 创建veth设备
+host1:
+# ip link add vethc00 type veth peer name vethc01
+# ip link set vetchc01 netns c0
+# ip netns exec c0 ip link set vethc01 up
+
+# ip link add vethc10 type veth peer name vethc11
+# ip link set vetchc11 netns c1
+# ip netns exec c1 ip link set vethc11 up
+
+# ip link add vethc20 type veth peer name vethc21
+# ip link set vetchc21 netns c2
+# ip netns exec c2 ip link set vethc21 up
+
+host2:
+# ip link add vethc00 type veth peer name vethc01
+# ip link set vetchc01 netns c0
+# ip netns exec c0 ip link set vethc01 up
+
+# ip link add vethc10 type veth peer name vethc11
+# ip link set vetchc11 netns c1
+# ip netns exec c1 ip link set vethc11 up
+
+# ip link add vethc20 type veth peer name vethc21
+# ip link set vetchc21 netns c2
+# ip netns exec c2 ip link set vethc21 up
+
+6. 使用veth将netns和网桥连接上
+host1:
+# ip link set dev vethc00 master bridge0
+# ip link set dev vethc10 master bridge0
+# ip link set dev vethc20 master bridge0
+# bridge link
+host2:
+# ip link set dev vethc00 master bridge0
+# ip link set dev vethc10 master bridge0
+# ip link set dev vethc20 master bridge0
+# bridge link
+
+7. 设置容器的地址
+host1: 
+# ip netns exec c0 ip address add 10.10.1.2/24 dev vethc01
+# ip netns exec c1 ip address add 10.10.1.3/24 dev vethc11
+# ip netns exec c2 ip address add 10.10.2.3/24 dev vethc21
+
+host2: 
+# ip netns exec c0 ip address add 10.10.1.4/24 dev vethc01
+# ip netns exec c1 ip address add 10.10.2.4/24 dev vethc11
+# ip netns exec c2 ip address add 10.10.2.5/24 dev vethc21
+
+8. 配置容器路由 目的是将所有网络流量均转发到网桥
+host1:
+# 删除每个容器上的默认路由
+# ip netns exec c0 ip route add 172.17.1.1 dev vethc01
+# ip netns exec c0 ip route default via  172.17.1.1
+# ip netns exec c1 ip route add 172.17.1.1 dev vethc11
+# ip netns exec c1 ip route default via  172.17.1.1
+# ip netns exec c2 ip route add 172.17.1.1 dev vethc21
+# ip netns exec c2 ip route default via  172.17.1.1
+
+# ip route add 10.10.1.2 dev bridge0
+# ip route add 10.10.1.3 dev bridge0
+# ip route add 10.10.2.3 dev bridge0
+
+host2:
+# 删除每个容器上的默认路由
+# ip netns exec c0 ip route add 172.17.1.1 dev vethc01
+# ip netns exec c0 ip route default via  172.17.1.1
+# ip netns exec c1 ip route add 172.17.1.1 dev vethc11
+# ip netns exec c1 ip route default via  172.17.1.1
+# ip netns exec c2 ip route add 172.17.1.1 dev vethc21
+# ip netns exec c2 ip route default via  172.17.1.1
+
+# ip route add 10.10.1.4 dev bridge0
+# ip route add 10.10.2.4 dev bridge0
+# ip route add 10.10.2.5 dev bridge0
+
+
+9. 检查每一个主机和主机上的容器是否想通 如果上述操作无误的话 应该是主机和容器可以互相联通的
+
+10. 开始进行跨主机通信
+分析:
+如果host1的c0想访问host2 那么它肯定是通过host1的bridge0路由过去的， 那么如果想host2还能回复c0 则就要求了必须进行一次DNAT转换。
+
+host1:
+
+10.1.1 c0跨主机访问
+# iptables -t nat -A POSTROUTING -s 10.10.1.2/32 -o bridge0 -j MASQUERADE
+
+10.1.2 c1跨主机访问
+# iptables -t nat -A POSTROUTING -s 10.10.1.3/32 -o bridge0 -j MASQUERADE
+
+10.1.3 c2跨主机访问
+# iptables -t nat -A POSTROUTING -s 10.10.2.3/32 -o bridge0 -j MASQUERADE
+
+host2:
+
+10.2.1 c0跨主机访问
+# iptables -t nat -A POSTROUTING -s 10.10.1.4/32 -o bridge0 -j MASQUERADE
+
+10.2.2 c1跨主机访问
+# iptables -t nat -A POSTROUTING -s 10.10.2.4/32 -o bridge0 -j MASQUERADE
+
+10.2.3 c2跨主机访问
+# iptables -t nat -A POSTROUTING -s 10.10.2.5/32 -o bridge0 -j MASQUERADE
+
+
+到了这里我们的容器之间就应该可以进行跨主机互相访问了。
+
+
+11. 容器能够进行外部网络访问
+分析:
+如果想外部网络访问 那么流量应该是通过ETH0这个网卡出去。 默认情况下如果你的主机访问外网是通过ETH0， 那么默认的路由表就已经配置了通过此网卡到最近的网关地址。 此时同样只需要进行DNAT准换即可。
+
+host1:
+
+10.1.1 c0外网访问
+# iptables -t nat -A POSTROUTING -s 10.10.1.2/32 -o eth0 -j MASQUERADE
+
+10.1.2 c1外网访问
+# iptables -t nat -A POSTROUTING -s 10.10.1.3/32 -o eth0 -j MASQUERADE
+
+10.1.3 c2外网访问
+# iptables -t nat -A POSTROUTING -s 10.10.2.3/32 -o eth0 -j MASQUERADE
+
+host2:
+
+10.2.1 c0外网访问
+# iptables -t nat -A POSTROUTING -s 10.10.1.4/32 -o eth0 -j MASQUERADE
+
+10.2.2 c1外网访问
+# iptables -t nat -A POSTROUTING -s 10.10.2.4/32 -o eth0 -j MASQUERADE
+
+10.2.3 c2外网访问
+# iptables -t nat -A POSTROUTING -s 10.10.2.5/32 -o eth0 -j MASQUERADE
+
+大功告成
+</code></pre>
+
+<h2 id="注意">注意</h2>
+
+<ol>
+<li>主机必须开启路由转发功能</li>
+<li>iptable表的默认规则设置成接受状态 最好能找一个空白的规则表做实验</li>
+<li>所有的link设备应该处于up状态</li>
+<li>如果出现不通时, 不要着急， 一步步排查。</li>
+<li>尽量要先懂得其中原理再实验</li>
+</ol>
+
+<h3 id="总结">总结</h3>
+
+<p>之前是做过一段时间docker的网络开发， 所以现在一直都有一些关注Linux方面的网络知识。 Linux的网络非常强大也很复杂, 本人也是只窥探冰山一角。 网上关于这方面的知识也不是很多， 所以希望能分析一些对还在从事docker网络相关的同学有所帮助。</p>
+                </div>
+                
+            </div>
+            <div class="col-lg-4">
+                
+                <div class="work-single-sidebar">
+                    
+                    <h5>Clients</h5>
+                    <h6>wupeaking</h6>
+                    
+                    
+                    <h5>date</h5>
+                    <h6>2月2号, 2019</h6>
+                    
+                    <h5>category</h5>
+                    <h6>Investment, Business</h6>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- work details part end -->
+
+
+
+<!-- Footer Section Start -->
+<footer id="footer">
+    <div class="container">
+        <div class="row content-justify-between">
+            <div class="col-md-8 col-12 text-center text-lg-left text-md-left">
+                <p class="copyright">Copyright wupeaking &copy;
+                    <span>
+                    
+                        2018 - 
+                    
+                        <script>document.write(new Date().getFullYear())</script>
+                    </span>
+                </p>
+                
+            </div>
+            <div class="col-md-4 col-12">
+                <!-- Social Media -->
+                <ul class="social text-center text-md-right text-lg-right">
+                
+                    <li>
+                        <a href="https://facebook.com" target="_blank">
+                            <i class="ion-social-facebook"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://twitter.com" target="_blank">
+                            <i class="ion-social-twitter"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://linkedin.com" target="_blank">
+                            <i class="ion-social-linkedin"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://googleplus.com" target="_blank">
+                            <i class="ion-social-googleplus"></i>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com/wupeaking" target="_blank">
+                            <i class="ion-social-github"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- footer section end -->
+
+<!-- jquery -->
+<script src="https://wupeaking.github.io/plugins/jQurey/jquery.min.js"></script>
+<!-- Form Validation -->
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.form.js"></script>
+<script src="https://wupeaking.github.io/plugins/form-validation/jquery.validate.min.js"></script>
+<!-- owl carouserl js -->
+<script src="https://wupeaking.github.io/plugins/owl-carousel/owl.carousel.min.js"></script>
+<!-- bootstrap js -->
+<script src="https://wupeaking.github.io/plugins/bootstrap/bootstrap.min.js"></script>
+<!-- wow js -->
+<script src="https://wupeaking.github.io/plugins/wow-js/wow.min.js"></script>
+<!-- slider js -->
+<script src="https://wupeaking.github.io/plugins/slider/slider.js"></script>
+<!-- Fancybox -->
+<script src="https://wupeaking.github.io/plugins/fancybox/jquery.fancybox.min.js"></script>
+<!-- template main js -->
+<script src="https://wupeaking.github.io/js/main.js"></script>
+</body>
+
+</html>

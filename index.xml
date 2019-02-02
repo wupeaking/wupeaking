@@ -6,10 +6,20 @@
     <description>Recent content on wupenxin的个人主页</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh_CN</language>
-    <lastBuildDate>Tue, 22 Jan 2019 10:47:57 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 02 Feb 2019 14:10:32 +0800</lastBuildDate>
     
 	<atom:link href="https://wupeaking.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用Linux的bridge设备和iptable功能实现容器之间跨主机通信</title>
+      <link>https://wupeaking.github.io/learn/linux_bridge_connection/</link>
+      <pubDate>Sat, 02 Feb 2019 14:10:32 +0800</pubDate>
+      
+      <guid>https://wupeaking.github.io/learn/linux_bridge_connection/</guid>
+      <description>&lt;p&gt;如果玩过docker的网络肯定了解各种为了实现docker容器之间的跨主机方案。 比如docker自带的overlay到weave，fannel，calico等。 有通过GRE格式的overlay进行跨主机通信，或者通过主机路由形式的。 今天我们通过Linux自带的bridge功能来实现容器的跨主机通信。
+&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>以太坊君士坦丁堡升级失败原因分析</title>
